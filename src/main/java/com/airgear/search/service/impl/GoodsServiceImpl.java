@@ -8,6 +8,7 @@ import com.airgear.search.mapper.GoodsSearchMapper;
 import com.airgear.search.repository.GoodsRepository;
 import com.airgear.search.service.GoodsService;
 import com.airgear.search.specification.GoodsSpecification;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,17 +22,11 @@ import java.time.OffsetDateTime;
 
 
 @Service(value = "goodsService")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class GoodsServiceImpl implements GoodsService {
 
-    GoodsRepository goodsRepository;
-    GoodsSearchMapper goodsSearchMapper;
-
-    @Autowired
-    public GoodsServiceImpl(GoodsRepository goodsRepository, GoodsSearchMapper goodsSearchMapper) {
-        this.goodsRepository = goodsRepository;
-        this.goodsSearchMapper = goodsSearchMapper;
-    }
+    private final GoodsRepository goodsRepository;
+    private final GoodsSearchMapper goodsSearchMapper;
 
     @Override
     public Page<GoodsSearchResponse> search(int page, int size, String name, BigDecimal minPrice, Price maxPrice, GoodsVerificationStatus verificationStatus, String goodsStatus, OffsetDateTime startCreatedAt, String endCreatedAt) {
@@ -46,6 +41,6 @@ public class GoodsServiceImpl implements GoodsService {
                 .endCreatedAt(endCreatedAt)
                 .build()
                 .createSpecification();
-        return goodsRepository.findAll(spec, pageRequest).map(goods -> goodsSearchMapper.toDto(goods));
+        return goodsRepository.findAll(spec, pageRequest).map(goodsSearchMapper::toDto);
     }
 }
