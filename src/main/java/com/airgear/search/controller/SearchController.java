@@ -3,13 +3,8 @@ package com.airgear.search.controller;
 import com.airgear.model.*;
 import com.airgear.search.dto.GoodsSearchResponse;
 import com.airgear.search.service.GoodsService;
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.AllArgsConstructor;
-import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +32,7 @@ public class SearchController {
             @RequestParam(required = false) String endCreatedAt) {
 
         return ResponseEntity
-                .ok(goodsService.search(page, size, name, minPrice, maxPrice, verificationStatus, goodsStatus, startCreatedAt, endCreatedAt));
+                .ok(goodsService.search(page, size, name, minPrice, maxPrice, verificationStatus, goodsStatus,
+                                        startCreatedAt, endCreatedAt));
     }
-
 }

@@ -9,11 +9,8 @@ import com.airgear.search.repository.GoodsRepository;
 import com.airgear.search.service.GoodsService;
 import com.airgear.search.specification.GoodsSpecification;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +26,9 @@ public class GoodsServiceImpl implements GoodsService {
     private final GoodsSearchMapper goodsSearchMapper;
 
     @Override
-    public Page<GoodsSearchResponse> search(int page, int size, String name, BigDecimal minPrice, Price maxPrice, GoodsVerificationStatus verificationStatus, String goodsStatus, OffsetDateTime startCreatedAt, String endCreatedAt) {
+    public Page<GoodsSearchResponse> search(int page, int size, String name, BigDecimal minPrice, Price maxPrice,
+                                            GoodsVerificationStatus verificationStatus, String goodsStatus,
+                                            OffsetDateTime startCreatedAt, String endCreatedAt) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Specification<Goods> spec = GoodsSpecification.builder()
                 .name(name)
