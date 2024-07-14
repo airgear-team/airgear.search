@@ -2,64 +2,46 @@ package com.airgear.search.specification;
 
 import com.airgear.model.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
 import org.springframework.data.jpa.domain.Specification;
 
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import javax.persistence.criteria.*;
 
-@Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class GoodsSpecification {
+public class GoodsSpecification implements Specification<Goods>{
 
-    private String name;
-    private BigDecimal minPrice;
-    private Price maxPrice;
-    private GoodsVerificationStatus verificationStatus;
-    private String goodsStatus;
-    private OffsetDateTime startCreatedAt;
-    private String endCreatedAt;
+    private SearchCriteria criteria;
 
-    public Specification<Goods> createSpecification() {
-        return Specification.where(nameContains())
-                .and(priceGreaterThan())
-                .and(priceLesserThan())
-                .and(verificationStatusIs())
-                .and(statusIs())
-                .and(createdAtBetween());
+    @Override
+    public Predicate toPredicate(
+            Root<Goods> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
+
+            return switch (criteria.getOperation()) {
+                case EQUALITY -> builder.equal(getExpression(root), criteria.getValue());
+                case NEGATION -> builder.notEqual(getExpression(root), criteria.getValue());
+                case GREATER_THAN -> builder.greaterThan(getExpression(root), criteria.getValue().toString());
+                case LESS_THAN -> builder.lessThan(getExpression(root), criteria.getValue().toString());
+                case LIKE -> builder.like(getExpression(root), criteria.getValue().toString());
+                case STARTS_WITH -> builder.like(getExpression(root), criteria.getValue() + "%");
+                case ENDS_WITH -> builder.like(getExpression(root), "%" + criteria.getValue());
+                case CONTAINS -> builder.like(getExpression(root), "%" + criteria.getValue() + "%");
+            };
+
     }
 
-    private Specification<Goods> nameContains() {
-        return (root, query, criteriaBuilder) ->
-                name == null ? null : criteriaBuilder.like(root.get("name"), "%" + name + "%");
+    private Path<String> getExpression(Root<Goods> root) {
+        String name = criteria.getKey();
+        if (!name.contains(".")) {
+            return root.get(name);
+        }
+        String[] s= name.split("\\.");
+        Path<String> res=root.get(s[0]);
+        int i=1;
+        while (i<s.length){
+            res =res.get(s[i]);
+            i++;
+        }
+        return res;
     }
 
-    private Specification<Goods> priceGreaterThan() {
-        return (root, query, criteriaBuilder) ->
-                minPrice == null ? null : criteriaBuilder.greaterThanOrEqualTo(root.get("price").get("priceAmount"), minPrice);
-    }
-
-    private Specification<Goods> priceLesserThan() {
-        return (root, query, criteriaBuilder) ->
-                minPrice == null ? null : criteriaBuilder.lessThanOrEqualTo(root.get("price").get("priceAmount"), maxPrice.getPriceAmount());
-    }
-
-    private Specification<Goods> verificationStatusIs() {
-        return (root, query, criteriaBuilder) ->
-                verificationStatus == null ? null : criteriaBuilder.equal(root.get("verificationStatus"), verificationStatus);
-    }
-
-    private Specification<Goods> statusIs() {
-        return (root, query, criteriaBuilder) ->
-                goodsStatus == null ? null : criteriaBuilder.equal(root.get("status"), goodsStatus);
-    }
-
-    private Specification<Goods> createdAtBetween() {
-        return (root, query, criteriaBuilder) ->
-                startCreatedAt == null || endCreatedAt == null ? null : criteriaBuilder.between(root.get("createdAt"), startCreatedAt, OffsetDateTime.parse(endCreatedAt));
-    }
 }
