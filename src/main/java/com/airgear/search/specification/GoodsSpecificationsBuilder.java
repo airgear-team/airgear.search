@@ -1,14 +1,15 @@
 package com.airgear.search.specification;
 
 import com.airgear.model.Goods;
-import com.airgear.model.User;
+import lombok.Data;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
 public class GoodsSpecificationsBuilder {
-    private final List<SearchCriteria> params;
+    public final List<SearchCriteria> params;
 
     public GoodsSpecificationsBuilder() {
         params = new ArrayList<>();

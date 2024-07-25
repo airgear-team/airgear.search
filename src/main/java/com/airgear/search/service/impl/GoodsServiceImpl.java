@@ -1,24 +1,20 @@
 package com.airgear.search.service.impl;
 
 import com.airgear.model.Goods;
-import com.airgear.model.GoodsVerificationStatus;
-import com.airgear.model.Price;
 import com.airgear.search.dto.GoodsSearchResponse;
 import com.airgear.search.mapper.GoodsSearchMapper;
 import com.airgear.search.repository.GoodsRepository;
+import com.airgear.search.repository.SearchCriteriaRepository;
 import com.airgear.search.service.GoodsService;
-import com.airgear.search.specification.GoodsSpecification;
 import com.airgear.search.specification.GoodsSpecificationsBuilder;
+import com.airgear.search.specification.SearchCriteria;
 import com.airgear.search.specification.SearchOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +25,7 @@ public class GoodsServiceImpl implements GoodsService {
 
     private final GoodsRepository goodsRepository;
     private final GoodsSearchMapper goodsSearchMapper;
+    private final SearchCriteriaRepository searchCriteriaRepository;
 
     @Override
     public Page<GoodsSearchResponse> search(String search, Pageable pageable){
@@ -40,6 +37,10 @@ public class GoodsServiceImpl implements GoodsService {
         while (matcher.find()) {
             builder.with(matcher.group(1), matcher.group(2), matcher.group(4), matcher.group(3), matcher.group(5));
         }
+        for (SearchCriteria sc: builder.getParams()) {
+            searchCriteriaRepository.save(sc);
+        }
+
         Specification<Goods> spec = builder.build();
 
         return goodsRepository.findAll(spec, pageable).map(goodsSearchMapper::toDto);

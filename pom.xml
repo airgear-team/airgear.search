@@ -124,6 +124,11 @@
             <artifactId>airgear.model</artifactId>
             <version>v1.1.17</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+            <version>3.3.2</version>
+        </dependency>
     </dependencies>
 
     <build>
