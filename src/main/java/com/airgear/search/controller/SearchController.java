@@ -16,6 +16,7 @@ public class SearchController {
 
     private final GoodsService goodsService;
 
+    @CrossOrigin(origins = "http://localhost:5173")
     @GetMapping("/")
     public Page<GoodsSearchResponse> searchGoods(@RequestParam(value = "search") String search,
                                                                  @PageableDefault(size = 30) Pageable pageable) {

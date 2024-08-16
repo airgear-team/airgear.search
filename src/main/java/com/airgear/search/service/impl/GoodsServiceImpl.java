@@ -4,12 +4,14 @@ import com.airgear.model.Goods;
 import com.airgear.search.dto.Filter;
 import com.airgear.search.dto.GoodsSearchResponse;
 import com.airgear.search.mapper.GoodsSearchMapper;
-import com.airgear.search.repository.FilterRepository;
+//import com.airgear.search.repository.FilterRepository;
 import com.airgear.search.repository.GoodsRepository;
 import com.airgear.search.service.GoodsService;
 import com.airgear.search.specification.GoodsSpecificationsBuilder;
 import com.airgear.search.specification.SearchOperation;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,16 +23,21 @@ import java.util.regex.Pattern;
 
 
 @Service(value = "goodsService")
-@AllArgsConstructor
 public class GoodsServiceImpl implements GoodsService {
 
-    private final GoodsRepository goodsRepository;
-    private final GoodsSearchMapper goodsSearchMapper;
-    private final FilterRepository filterRepository;
+    private GoodsRepository goodsRepository;
+    private GoodsSearchMapper goodsSearchMapper;
+    //private FilterRepository filterRepository;
+
+    @Autowired
+    public GoodsServiceImpl(GoodsRepository goodsRepository, GoodsSearchMapper goodsSearchMapper) {
+        this.goodsRepository = goodsRepository;
+        this.goodsSearchMapper = goodsSearchMapper;
+    }
 
     @Override
     public Page<GoodsSearchResponse> search(String search, Pageable pageable){
-        filterRepository.save(new Filter(search, LocalDateTime.now()));
+        //filterRepository.save(new Filter(search, LocalDateTime.now()));
         GoodsSpecificationsBuilder builder = new GoodsSpecificationsBuilder();
         String operationSetExp = String.join("|", SearchOperation.SIMPLE_OPERATION_SET);
         Pattern pattern = Pattern.compile(
